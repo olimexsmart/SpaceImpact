@@ -9,9 +9,10 @@ namespace SpaceImpact
     {
         private Wallpaper() { }
 
-        public Wallpaper(SpriteBatch spriteBatch, Texture2D texture, int heigh, int width) : base(spriteBatch, texture, heigh, width)
+        //That backgrond wallpaper has to be of the same dimensions as the game window
+        public Wallpaper(SpriteBatch spriteBatch, Texture2D texture) : base(spriteBatch, texture, GameHeight, GameWidth)
         {
-            
+            //It's just an image after all
         }
     }
 }

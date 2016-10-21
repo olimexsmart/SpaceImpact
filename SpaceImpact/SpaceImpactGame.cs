@@ -15,6 +15,10 @@ namespace SpaceImpact
         Spaceship spaceship;
         Wallpaper wallpaper;
         Stopwatch update;
+        Dust[] dust;
+        int GameHeight = 600;
+        int GameWidth = 960;
+        int DustIntensity = 10;
 
         public SpaceImpactGame()
         {
@@ -30,10 +34,12 @@ namespace SpaceImpact
         /// </summary>
         protected override void Initialize()
         {
-            graphics.PreferredBackBufferWidth = 960;  // set this value to the desired width of your window
-            graphics.PreferredBackBufferHeight = 600;   // set this value to the desired height of your window
+            graphics.PreferredBackBufferWidth = GameWidth;  // set this value to the desired width of your window
+            graphics.PreferredBackBufferHeight = GameHeight;   // set this value to the desired height of your window
             graphics.ApplyChanges();
 
+            SpaceComponents.GameWidth = GameWidth;
+            SpaceComponents.GameHeight = GameHeight;
 
             base.Initialize();
         }
@@ -48,7 +54,23 @@ namespace SpaceImpact
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             spaceship = new Spaceship(spriteBatch, Content.Load<Texture2D>("spaceship"), 50, 50, 100, 100); //Avoid asteroids in initial position
-            wallpaper = new Wallpaper(spriteBatch, Content.Load<Texture2D>("spaceTexture"), 600, 960);
+            wallpaper = new Wallpaper(spriteBatch, Content.Load<Texture2D>("spaceTexture"));
+
+            dust = new Dust[DustIntensity];
+
+            int i;
+            for (i = 0; i < 2; i++)          
+                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust1"));
+
+            for (; i < 5; i++)
+                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust2"));
+
+            for (; i < 7; i++)
+                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust3"));
+
+            for (; i < dust.Length; i++)
+                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust4"));
+
 
             //Delta T between updates
             update = new Stopwatch();
@@ -77,7 +99,11 @@ namespace SpaceImpact
             long dT = update.ElapsedMilliseconds; //Time differential
 
             spaceship.Move(dT);
-            spaceship.BoundariesCheck(wallpaper.Width, wallpaper.Height);
+
+            foreach (Dust d in dust)
+            {
+                d.Move(dT);
+            }    
 
             base.Update(gameTime);
 
@@ -96,6 +122,10 @@ namespace SpaceImpact
 
             wallpaper.Draw();
             spaceship.Draw();
+            foreach (Dust d in dust)
+            {
+                d.Draw();
+            }
 
             spriteBatch.End();
             base.Draw(gameTime);

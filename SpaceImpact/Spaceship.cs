@@ -12,14 +12,14 @@ namespace SpaceImpact
         //Point object holds the top-left corner of the rectangle in order to draw it
         public int PosX { get { return Position.X + (Width / 2); } private set { Position.X = value - (Width / 2); } }
         public int PosY { get { return Position.Y + (Height / 2); } private set { Position.Y = value - (Height / 2); } }
-        private float speed = 0.2f;
-        public float Speed
+        private static float speed = GameSpeed;
+        public static float Speed
         {
             get { return speed; }
             set
             {
                 if (value < 0) throw new ArithmeticException("Negative speed inerted.");
-                else speed = value;
+                else speed = value * GameSpeed;
             }
         }
 
@@ -29,6 +29,7 @@ namespace SpaceImpact
         public Spaceship(SpriteBatch spriteBatch, Texture2D texture, int height, int width, int positionX, int positionY) : base(spriteBatch, texture, height, width)
         {
             Position = new Point(positionX, positionY);
+            Speed = 20;
         }
 
 
@@ -58,16 +59,15 @@ namespace SpaceImpact
 
             //Moving LEFT
             if (ks.IsKeyUp(Keys.D) && ks.IsKeyDown(Keys.A))
-                PosX -= (int)(dT * Speed);            
-        }
+                PosX -= (int)(dT * Speed);
 
-        public void BoundariesCheck(int maxX, int maxY)
-        {   //Y boundaries
-            PosY = Math.Min(PosY, maxY); 
+            //Don't fly too far
+            //Y boundaries
+            PosY = Math.Min(PosY, GameHeight);
             PosY = Math.Max(PosY, 0);
             //X boundaries
-            PosX = Math.Min(PosX, maxX);
-            PosX = Math.Max(PosX, 0);            
+            PosX = Math.Min(PosX, GameWidth);
+            PosX = Math.Max(PosX, 0);
         }
     }
 }

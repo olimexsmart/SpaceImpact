@@ -33,6 +33,42 @@ namespace SpaceImpact
             }
         }
 
+        //Every components needs to know how much the screen is
+        //VGA deafult value
+        private static int maxX = 640; 
+        private static int maxY = 480;
+        public static int GameWidth
+        {
+            get { return maxX; }
+            set
+            {
+                if (value < 0) throw new ArithmeticException("Negative dimension");
+                else maxX = value;
+            }
+        }
+        public static int GameHeight
+        {
+            get { return maxY; }
+            set
+            {
+                if (value < 0) throw new ArithmeticException("Negative dimension");
+                else maxY = value;
+            }
+        }
+
+        private static float gameSpeed = 0.02f; //Default
+        public static float GameSpeed
+        {
+            get { return gameSpeed; }
+            set
+            {
+                if (value < 0) throw new ArithmeticException("No negative speed.");
+                else
+                    gameSpeed = value;
+            }
+        }
+
+
         protected SpaceComponents() { }
 
         //The texture can be only loaded, 
