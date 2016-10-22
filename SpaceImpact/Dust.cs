@@ -12,6 +12,7 @@ namespace SpaceImpact
 
         public Dust(SpriteBatch spriteBatch, Texture2D texture) : base(spriteBatch, texture)
         {
+            HeightMax = GameHeight;            
             CreateNew();
         }                
     }

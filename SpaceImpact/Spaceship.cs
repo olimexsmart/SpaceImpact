@@ -45,6 +45,7 @@ namespace SpaceImpact
         public void Move(long dT)
         {
             KeyboardState ks = Keyboard.GetState();
+            Point mouse = Mouse.GetState().Position;            
             
             //Moving UP
             if (ks.IsKeyDown(Keys.W) && ks.IsKeyUp(Keys.S))
@@ -68,6 +69,10 @@ namespace SpaceImpact
             //X boundaries
             PosX = Math.Min(PosX, GameWidth);
             PosX = Math.Max(PosX, 0);
+
+
+            //Keep the spaceship pointed towards the mouse
+
         }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace SpaceImpact
 {
-    public class SpaceComponents
+    public class SpaceComponents : IDrawable
     {
         protected Texture2D Texture;
         protected SpriteBatch SpriteBatch;

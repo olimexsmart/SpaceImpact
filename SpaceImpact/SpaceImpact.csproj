@@ -41,6 +41,7 @@
     <Compile Include="Asteroid.cs" />
     <Compile Include="Dust.cs" />
     <Compile Include="FallingObject.cs" />
+    <Compile Include="IDrawable.cs" />
     <Compile Include="SpaceImpactGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

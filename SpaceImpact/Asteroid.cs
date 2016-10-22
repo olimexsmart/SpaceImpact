@@ -11,12 +11,16 @@ namespace SpaceImpact
         private Texture2D[] asteroid;
         //These two will help deciding when update the texture
         int rotation;
-        int prevPos;
+        long prevPos;
+
+        protected Asteroid() { }
 
         //Start with the first image
-        private Asteroid(SpriteBatch spriteBatch, Texture2D[] texture) : base(spriteBatch, texture[0])
+        public Asteroid(SpriteBatch spriteBatch, Texture2D[] texture) : base(spriteBatch, texture[0])
         {
+            HeightMax = GameWidth / 6;
             rotation = 0;
+            asteroid = texture;
             CreateNew();
             prevPos = PosY;
         }
@@ -25,7 +29,19 @@ namespace SpaceImpact
         public override void Move(long dT)
         {
             base.Move(dT);
-            throw new NotImplementedException();
+            prevPos += dT;
+            if (prevPos > 30) //33 FPS
+            {
+                prevPos = 0;              
+                rotation++;
+                rotation %= asteroid.Length; //Not overflow
+                Texture = asteroid[rotation]; //Update the frame
+            }
         }
+
+        //public override void Draw()
+        //{            
+        //    base.Draw();
+        //}
     }
 }

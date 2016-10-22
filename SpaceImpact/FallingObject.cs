@@ -23,12 +23,24 @@ namespace SpaceImpact
             }
         }
 
+        private int heightMax;
+        protected int HeightMax
+        {
+            get { return heightMax; }
+            set
+            {
+                if (value < 0) throw new ArithmeticException("Negative dimension");
+                else heightMax = value;
+            }
+        }     
 
+        static private Random caos = new Random((int)DateTime.Now.Ticks); //This object does what it wants
+    
         protected FallingObject() { }
 
         protected FallingObject(SpriteBatch spriteBatch, Texture2D texture) : base(spriteBatch, texture, 0, 0)
         {
-
+            
         }
 
         public override void Draw()
@@ -50,17 +62,16 @@ namespace SpaceImpact
         }
 
         protected void CreateNew()
-        {
-            Random caos = new Random((int)DateTime.Now.Ticks); //This object does what it wants
+        {            
             //Dimensions not specified, but the original texture ration will be conserved
-            Height = caos.Next(GameHeight / 10, GameHeight);
+            Height = caos.Next(HeightMax / 10, HeightMax);
             float ratio = (float)Texture.Height / (float)Texture.Width;
             Width = (int)(Height / ratio);
             //Speed
-            Speed = caos.Next(1, 50);
+            Speed = caos.Next(10, 20);
             //And position
             PosX = caos.Next(0, GameWidth);
-            PosY = -Height; //It needs to start outside the window
+            PosY = -Height - caos.Next(0, 500); //It needs to start outside the window
         }
     }
 }

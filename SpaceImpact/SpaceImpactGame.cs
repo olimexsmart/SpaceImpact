@@ -16,9 +16,12 @@ namespace SpaceImpact
         Wallpaper wallpaper;
         Stopwatch update;
         Dust[] dust;
+        Asteroid[] asteroid;
+        IDrawable[] components; //Hold the components in their drawing order
         int GameHeight = 600;
         int GameWidth = 960;
-        int DustIntensity = 10;
+        int DustIntensity = 4;
+        int AsteroidDensity = 25;
 
         public SpaceImpactGame()
         {
@@ -52,24 +55,52 @@ namespace SpaceImpact
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            //Crating a unique container for these elements
+            components = new IDrawable[2 + DustIntensity + AsteroidDensity];
 
             spaceship = new Spaceship(spriteBatch, Content.Load<Texture2D>("spaceship"), 50, 50, 100, 100); //Avoid asteroids in initial position
+            components[1] = spaceship;
+
             wallpaper = new Wallpaper(spriteBatch, Content.Load<Texture2D>("spaceTexture"));
+            components[0] = wallpaper;
 
-            dust = new Dust[DustIntensity];
-
+            //Asteroids init
             int i;
-            for (i = 0; i < 2; i++)          
-                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust1"));
+            asteroid = new Asteroid[AsteroidDensity];
+            Texture2D allFrames = Content.Load<Texture2D>("dynAsteroid");
+            Texture2D[] frames = new Texture2D[64];
+            for (i = 0; i < frames.Length; i++)
+            {
+                frames[i] = Crop(allFrames, new Rectangle(128 * (i % 8), 128 * (i / 8), 128, 128));
+            }
+            for (i = 0; i < asteroid.Length; i++)
+            {
+                asteroid[i] = new Asteroid(spriteBatch, frames);
+                components[i + 2] = asteroid[i];
+            }
 
-            for (; i < 5; i++)
-                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust2"));
 
-            for (; i < 7; i++)
-                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust3"));
+            //Dust nebulas init, TODO better this init part of the dust
+            dust = new Dust[DustIntensity];
+           
+            //for (i = 0; i < 2; i++)          
+            dust[0] = new Dust(spriteBatch, Content.Load<Texture2D>("dust1"));
 
-            for (; i < dust.Length; i++)
-                dust[i] = new Dust(spriteBatch, Content.Load<Texture2D>("dust4"));
+            //for (; i < 5; i++)
+            dust[1] = new Dust(spriteBatch, Content.Load<Texture2D>("dust2"));
+
+            //for (; i < 7; i++)
+            dust[2] = new Dust(spriteBatch, Content.Load<Texture2D>("dust3"));
+
+            //for (; i < dust.Length; i++)
+            dust[3] = new Dust(spriteBatch, Content.Load<Texture2D>("dust4"));
+            i = 2 + AsteroidDensity;
+            foreach (Dust d in dust)
+            {
+                components[i] = d;
+                i++;
+            }
+
 
 
             //Delta T between updates
@@ -101,9 +132,10 @@ namespace SpaceImpact
             spaceship.Move(dT);
 
             foreach (Dust d in dust)
-            {
                 d.Move(dT);
-            }    
+
+            foreach (Asteroid a in asteroid)
+                a.Move(dT);
 
             base.Update(gameTime);
 
@@ -120,15 +152,38 @@ namespace SpaceImpact
 
             spriteBatch.Begin();
 
-            wallpaper.Draw();
-            spaceship.Draw();
-            foreach (Dust d in dust)
-            {
-                d.Draw();
-            }
+            foreach (IDrawable item in components)            
+                item.Draw();
+            
 
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        private static Texture2D Crop(Texture2D source, Rectangle area)
+        {
+            if (source == null)
+                return null;
+
+            Texture2D cropped = new Texture2D(source.GraphicsDevice, area.Width, area.Height);
+            Color[] data = new Color[source.Width * source.Height];
+            Color[] cropData = new Color[cropped.Width * cropped.Height];
+
+            source.GetData(data);
+
+            int index = 0;
+            for (int y = area.Y; y < area.Y + area.Height; y++)
+            {
+                for (int x = area.X; x < area.X + area.Width; x++)
+                {
+                    cropData[index] = data[x + (y * source.Width)];
+                    index++;
+                }
+            }
+
+            cropped.SetData(cropData);
+
+            return cropped;
         }
     }
 }
