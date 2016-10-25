@@ -39,6 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Asteroid.cs" />
+    <Compile Include="Bullet.cs" />
     <Compile Include="Dust.cs" />
     <Compile Include="FallingObject.cs" />
     <Compile Include="IDrawable.cs" />

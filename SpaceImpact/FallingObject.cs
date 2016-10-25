@@ -38,7 +38,7 @@ namespace SpaceImpact
     
         protected FallingObject() { }
 
-        protected FallingObject(SpriteBatch spriteBatch, Texture2D texture) : base(spriteBatch, texture, 0, 0)
+        protected FallingObject(Texture2D texture) : base(texture, 0, 0)
         {
             
         }

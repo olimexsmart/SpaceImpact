@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace SpaceImpact
 {
@@ -18,6 +19,14 @@ namespace SpaceImpact
         Dust[] dust;
         Asteroid[] asteroid;
         IDrawable[] components; //Hold the components in their drawing order
+        Texture2D mouseTexture;
+        Texture2D bulletTexture;
+        //Maybe this should stay in another class
+        List<Bullet> flyingBullets;
+        long fireRate = 250;
+        long lastFire = 0;
+
+        Vector2 mouse;
         int GameHeight = 600;
         int GameWidth = 960;
         int DustIntensity = 4;
@@ -55,13 +64,15 @@ namespace SpaceImpact
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            SpaceComponents.SpriteBatch = spriteBatch;
+
             //Crating a unique container for these elements
             components = new IDrawable[2 + DustIntensity + AsteroidDensity];
 
-            spaceship = new Spaceship(spriteBatch, Content.Load<Texture2D>("spaceship"), 50, 50, 100, 100); //Avoid asteroids in initial position
+            spaceship = new Spaceship(Content.Load<Texture2D>("spaceship")); //Avoid asteroids in initial position
             components[1] = spaceship;
 
-            wallpaper = new Wallpaper(spriteBatch, Content.Load<Texture2D>("spaceTexture"));
+            wallpaper = new Wallpaper(Content.Load<Texture2D>("spaceTexture"));
             components[0] = wallpaper;
 
             //Asteroids init
@@ -75,7 +86,7 @@ namespace SpaceImpact
             }
             for (i = 0; i < asteroid.Length; i++)
             {
-                asteroid[i] = new Asteroid(spriteBatch, frames);
+                asteroid[i] = new Asteroid(frames);
                 components[i + 2] = asteroid[i];
             }
 
@@ -84,16 +95,16 @@ namespace SpaceImpact
             dust = new Dust[DustIntensity];
            
             //for (i = 0; i < 2; i++)          
-            dust[0] = new Dust(spriteBatch, Content.Load<Texture2D>("dust1"));
+            dust[0] = new Dust(Content.Load<Texture2D>("dust1"));
 
             //for (; i < 5; i++)
-            dust[1] = new Dust(spriteBatch, Content.Load<Texture2D>("dust2"));
+            dust[1] = new Dust(Content.Load<Texture2D>("dust2"));
 
             //for (; i < 7; i++)
-            dust[2] = new Dust(spriteBatch, Content.Load<Texture2D>("dust3"));
+            dust[2] = new Dust(Content.Load<Texture2D>("dust3"));
 
             //for (; i < dust.Length; i++)
-            dust[3] = new Dust(spriteBatch, Content.Load<Texture2D>("dust4"));
+            dust[3] = new Dust(Content.Load<Texture2D>("dust4"));
             i = 2 + AsteroidDensity;
             foreach (Dust d in dust)
             {
@@ -101,7 +112,13 @@ namespace SpaceImpact
                 i++;
             }
 
+            //Mouse pointer
+            mouseTexture = Content.Load<Texture2D>("aim");
+            mouse = new Vector2(0, 0);
 
+            //Bullet texture
+            bulletTexture = Crop(Content.Load<Texture2D>("bullet"), new Rectangle(177, 68, 18, 18));
+            flyingBullets = new List<Bullet> { };
 
             //Delta T between updates
             update = new Stopwatch();
@@ -135,7 +152,24 @@ namespace SpaceImpact
                 d.Move(dT);
 
             foreach (Asteroid a in asteroid)
-                a.Move(dT);
+                a.Move(dT);            
+
+            mouse.X = Mouse.GetState().X;
+            mouse.Y = Mouse.GetState().Y;
+
+            //Bullet management
+            lastFire += dT;
+            if (lastFire > fireRate) //Crate a new bullet
+            {
+                flyingBullets.Add(new Bullet(bulletTexture, spaceship.PosX, spaceship.PosY));
+                lastFire = 0;
+            }
+
+            flyingBullets.RemoveAll(x => x.OutOfBounds); //MAMMA MIAAAAAAA SEE
+
+            foreach (Bullet b in flyingBullets)            
+                b.Move(dT);
+            
 
             base.Update(gameTime);
 
@@ -152,9 +186,21 @@ namespace SpaceImpact
 
             spriteBatch.Begin();
 
-            foreach (IDrawable item in components)            
-                item.Draw();
+            wallpaper.Draw();
+            spaceship.Draw();
+
+            foreach (Asteroid a in asteroid)
+                a.Draw();
+
+            foreach (Bullet b in flyingBullets)
+                b.Draw();
+
+            foreach (Dust d in dust)
+                d.Draw();
             
+
+            //Mouse pointer draw
+            spriteBatch.Draw(mouseTexture, new Rectangle((int)mouse.X - GameHeight / 20, (int)mouse.Y - GameHeight / 20, GameHeight / 10, GameHeight / 10), Color.White);
 
             spriteBatch.End();
             base.Draw(gameTime);

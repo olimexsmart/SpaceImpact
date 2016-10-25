@@ -16,7 +16,7 @@ namespace SpaceImpact
         protected Asteroid() { }
 
         //Start with the first image
-        public Asteroid(SpriteBatch spriteBatch, Texture2D[] texture) : base(spriteBatch, texture[0])
+        public Asteroid(Texture2D[] texture) : base(texture[0])
         {
             HeightMax = GameWidth / 6;
             rotation = 0;

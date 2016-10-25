@@ -5,15 +5,15 @@ using Microsoft.Xna.Framework.Input;
 
 namespace SpaceImpact
 {
-    class Spaceship : SpaceComponents
+    public class Spaceship : SpaceComponents
     {
-        private Point Position;        
-        //These proprieties are reference to the middle point of the spaceship, while the
+        protected Point Position;        
+        //These proprietiesare reference to the middle point of the spaceship, while the
         //Point object holds the top-left corner of the rectangle in order to draw it
-        public int PosX { get { return Position.X + (Width / 2); } private set { Position.X = value - (Width / 2); } }
-        public int PosY { get { return Position.Y + (Height / 2); } private set { Position.Y = value - (Height / 2); } }
-        private static float speed = GameSpeed;
-        public static float Speed
+        public int PosX { get { return Position.X + (Width / 2); } protected set { Position.X = value - (Width / 2); } }
+        public int PosY { get { return Position.Y + (Height / 2); } protected set { Position.Y = value - (Height / 2); } }
+        private float speed = GameSpeed;
+        public float Speed
         {
             get { return speed; }
             set
@@ -23,12 +23,14 @@ namespace SpaceImpact
             }
         }
 
+        protected float rotation;
 
-        private Spaceship() { }
 
-        public Spaceship(SpriteBatch spriteBatch, Texture2D texture, int height, int width, int positionX, int positionY) : base(spriteBatch, texture, height, width)
+        protected Spaceship() { }
+
+        public Spaceship(Texture2D texture) : base(texture, GameHeight / 10, GameHeight / 10)
         {
-            Position = new Point(positionX, positionY);
+            Position = new Point(GameHeight / 2, GameWidth / 2);
             Speed = 20;
         }
 
@@ -39,10 +41,13 @@ namespace SpaceImpact
             where.Y = Position.Y;
             where.Height = Height;
             where.Width = Width;
-            base.Draw();
+
+            SpriteBatch.Draw(Texture, null , where, null, new Vector2(Texture.Bounds.Center.X, Texture.Bounds.Center.Y), rotation); //All-argument overload with default values
+            
+            //base.Draw(); We need rotation
         }
 
-        public void Move(long dT)
+        public virtual void Move(long dT)
         {
             KeyboardState ks = Keyboard.GetState();
             Point mouse = Mouse.GetState().Position;            
@@ -69,9 +74,10 @@ namespace SpaceImpact
             //X boundaries
             PosX = Math.Min(PosX, GameWidth);
             PosX = Math.Max(PosX, 0);
-
+            
 
             //Keep the spaceship pointed towards the mouse
+            rotation = (float) Math.Atan2(mouse.X - PosX, PosY - mouse.Y);
 
         }
     }

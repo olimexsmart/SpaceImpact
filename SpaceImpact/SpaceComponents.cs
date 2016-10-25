@@ -8,7 +8,7 @@ namespace SpaceImpact
     public class SpaceComponents : IDrawable
     {
         protected Texture2D Texture;
-        protected SpriteBatch SpriteBatch;
+        public static SpriteBatch SpriteBatch;
         protected Rectangle where;
         //Dimensions
         private int height, width;
@@ -74,10 +74,9 @@ namespace SpaceImpact
         //The texture can be only loaded, 
         //The spriteBatch will be the same object for all components
         //The position will be updated so it need to be accessible
-        protected SpaceComponents(SpriteBatch spriteBatch, Texture2D texture, int height, int width)
+        protected SpaceComponents(Texture2D texture, int height, int width)
         {
-            Texture = texture;
-            SpriteBatch = spriteBatch;            
+            Texture = texture;                
             Width = width;
             Height = height;
             where = new Rectangle(0, 0, Width, Height);
