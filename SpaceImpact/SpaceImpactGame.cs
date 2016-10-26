@@ -13,6 +13,7 @@ namespace SpaceImpact
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteFont spriteFont;
         Spaceship spaceship;
         Wallpaper wallpaper;
         Stopwatch update;
@@ -65,6 +66,7 @@ namespace SpaceImpact
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             SpaceComponents.SpriteBatch = spriteBatch;
+            spriteFont = Content.Load<SpriteFont>("FontArial");
 
             //Crating a unique container for these elements
             components = new IDrawable[2 + DustIntensity + AsteroidDensity];
@@ -201,6 +203,9 @@ namespace SpaceImpact
 
             //Mouse pointer draw
             spriteBatch.Draw(mouseTexture, new Rectangle((int)mouse.X - GameHeight / 20, (int)mouse.Y - GameHeight / 20, GameHeight / 10, GameHeight / 10), Color.White);
+
+            //Text outuput
+            spriteBatch.DrawString(spriteFont, "Mouse positon: " + mouse.X + ", " + mouse.Y + "\nBullets: " + flyingBullets.Count, new Vector2(0, 0), Color.Red);
 
             spriteBatch.End();
             base.Draw(gameTime);

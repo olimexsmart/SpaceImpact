@@ -7,11 +7,11 @@ namespace SpaceImpact
 {
     public class Spaceship : SpaceComponents
     {
-        protected Point Position;        
+        private Point Position;        
         //These proprietiesare reference to the middle point of the spaceship, while the
         //Point object holds the top-left corner of the rectangle in order to draw it
-        public int PosX { get { return Position.X + (Width / 2); } protected set { Position.X = value - (Width / 2); } }
-        public int PosY { get { return Position.Y + (Height / 2); } protected set { Position.Y = value - (Height / 2); } }
+        public int PosX { get { return Position.X; } protected set { Position.X = value; } }
+        public int PosY { get { return Position.Y; } protected set { Position.Y = value; } }
         private float speed = GameSpeed;
         public float Speed
         {
@@ -30,15 +30,16 @@ namespace SpaceImpact
 
         public Spaceship(Texture2D texture) : base(texture, GameHeight / 10, GameHeight / 10)
         {
-            Position = new Point(GameHeight / 2, GameWidth / 2);
+            PosX = GameWidth / 2;
+            PosY = GameHeight / 2;
             Speed = 20;
         }
 
 
         public override void Draw()
         {
-            where.X = Position.X;
-            where.Y = Position.Y;
+            where.X = PosX;
+            where.Y = PosY;
             where.Height = Height;
             where.Width = Width;
 

@@ -121,3 +121,9 @@
 /processorParam:TextureFormat=Color
 /build:bullet.png
 
+#begin FontArial.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:FontArial.spritefont
+
