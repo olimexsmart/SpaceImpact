@@ -11,7 +11,7 @@ namespace SpaceImpact
 
         public bool OutOfBounds { get; private set; }
 
-        private float SenRot, CosRot;
+        private float SenRot, CosRot;        
 
         public Bullet(Texture2D texture, int originX, int originY) : base(texture)
         {
@@ -37,6 +37,14 @@ namespace SpaceImpact
             //Check if out of screen, an event here may be better
             if (PosX < 0 | PosX > GameWidth) OutOfBounds = true;
             if (PosY < 0 | PosY > GameHeight) OutOfBounds = true;
+        }
+
+        public override void Draw()
+        {
+            //Collapse it so it can't be seen
+            where.Height = 0;
+            where.Width = 0;
+            base.Draw();
         }
     }
 }

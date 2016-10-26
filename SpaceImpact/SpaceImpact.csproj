@@ -42,6 +42,7 @@
     <Compile Include="Bullet.cs" />
     <Compile Include="Dust.cs" />
     <Compile Include="FallingObject.cs" />
+    <Compile Include="ICollidable.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="SpaceImpactGame.cs" />
     <Compile Include="Program.cs" />

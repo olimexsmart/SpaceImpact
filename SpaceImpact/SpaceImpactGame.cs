@@ -31,7 +31,7 @@ namespace SpaceImpact
         int GameHeight = 600;
         int GameWidth = 960;
         int DustIntensity = 4;
-        int AsteroidDensity = 25;
+        int AsteroidDensity = 1;
 
         public SpaceImpactGame()
         {
@@ -122,6 +122,18 @@ namespace SpaceImpact
             bulletTexture = Crop(Content.Load<Texture2D>("bullet"), new Rectangle(177, 68, 18, 18));
             flyingBullets = new List<Bullet> { };
 
+            //Explosion frames loading
+            Spaceship.Explosion = new Texture2D[48];
+            Asteroid.Explosion = new Texture2D[48];
+            Texture2D frame;
+            allFrames = Content.Load<Texture2D>("explosion");
+            for (i = 0; i < 48; i++)
+            {
+                frame = Crop(allFrames, new Rectangle(256 * (i % 8), 256 * (i / 8), 256, 256));
+                Spaceship.Explosion[i] = frame;
+                Asteroid.Explosion[i] = frame;
+            }
+
             //Delta T between updates
             update = new Stopwatch();
             update.Start();
@@ -160,17 +172,29 @@ namespace SpaceImpact
             mouse.Y = Mouse.GetState().Y;
 
             //Bullet management
-            lastFire += dT;
-            if (lastFire > fireRate) //Crate a new bullet
+            if (!spaceship.IsExploded())
             {
-                flyingBullets.Add(new Bullet(bulletTexture, spaceship.PosX, spaceship.PosY));
-                lastFire = 0;
+                lastFire += dT;
+                if (lastFire > fireRate) //Crate a new bullet
+                {
+                    flyingBullets.Add(new Bullet(bulletTexture, spaceship.PosX, spaceship.PosY));
+                    lastFire = 0;
+                }
             }
-
             flyingBullets.RemoveAll(x => x.OutOfBounds); //MAMMA MIAAAAAAA SEE
-
             foreach (Bullet b in flyingBullets)            
                 b.Move(dT);
+
+            //Collision detection
+            foreach (ICollidable a in asteroid)
+            {
+                a.DetectCollision(spaceship); //Between spaceship and asteroid
+
+                foreach (ICollidable b in flyingBullets)//Asteroids and bullets
+                {
+                    b.DetectCollision(a);
+                }
+            }
             
 
             base.Update(gameTime);
