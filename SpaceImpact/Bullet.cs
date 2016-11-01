@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace SpaceImpact
 {
-    public class Bullet : Spaceship
+    public class Bullet : SpaceComponents
     {        
         private Bullet() { }
 
@@ -13,11 +13,9 @@ namespace SpaceImpact
 
         private float SenRot, CosRot;        
 
-        public Bullet(Texture2D texture, int originX, int originY) : base(texture)
+        public Bullet(Texture2D texture, int originX, int originY) : base(texture, WindowHeight / 20, WindowHeight / 20)
         {
             Speed = 30;            
-            Height = GameHeight / 20;
-            Width = Height;
             PosX = originX;
             PosY = originY;
             //This is fixed
@@ -35,16 +33,13 @@ namespace SpaceImpact
             PosY -= (int)(CosRot * Speed * dT);
 
             //Check if out of screen, an event here may be better
-            if (PosX < 0 | PosX > GameWidth) OutOfBounds = true;
-            if (PosY < 0 | PosY > GameHeight) OutOfBounds = true;
+            if (PosX < 0 | PosX > WindowWidth) OutOfBounds = true;
+            if (PosY < 0 | PosY > WindowHeight) OutOfBounds = true;
         }
 
-        public override void Draw()
-        {
-            //Collapse it so it can't be seen
-            where.Height = 0;
-            where.Width = 0;
-            base.Draw();
-        }
+        //public override void Draw()
+        //{
+        //    base.Draw();
+        //}
     }
 }

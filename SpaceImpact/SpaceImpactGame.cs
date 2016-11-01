@@ -31,7 +31,7 @@ namespace SpaceImpact
         int GameHeight = 600;
         int GameWidth = 960;
         int DustIntensity = 4;
-        int AsteroidDensity = 1;
+        int AsteroidDensity = 20;
 
         public SpaceImpactGame()
         {
@@ -51,8 +51,8 @@ namespace SpaceImpact
             graphics.PreferredBackBufferHeight = GameHeight;   // set this value to the desired height of your window
             graphics.ApplyChanges();
 
-            SpaceComponents.GameWidth = GameWidth;
-            SpaceComponents.GameHeight = GameHeight;
+            SpaceComponents.WindowWidth = GameWidth;
+            SpaceComponents.WindowHeight = GameHeight;
 
             base.Initialize();
         }

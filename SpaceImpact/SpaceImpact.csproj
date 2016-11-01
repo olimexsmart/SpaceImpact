@@ -40,10 +40,13 @@
   <ItemGroup>
     <Compile Include="Asteroid.cs" />
     <Compile Include="Bullet.cs" />
+    <Compile Include="BulletManager.cs" />
     <Compile Include="Dust.cs" />
+    <Compile Include="Explosion.cs" />
     <Compile Include="FallingObject.cs" />
     <Compile Include="ICollidable.cs" />
     <Compile Include="IDrawable.cs" />
+    <Compile Include="MousePointer.cs" />
     <Compile Include="SpaceImpactGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

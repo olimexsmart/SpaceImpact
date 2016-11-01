@@ -5,81 +5,74 @@ using Microsoft.Xna.Framework.Input;
 
 namespace SpaceImpact
 {
-    class Asteroid : FallingObject, ICollidable
+    public class Asteroid : FallingObject//, ICollidable
     {
-        private static Texture2D[] asteroid;
-        //These two will help deciding when update the texture
-        byte rotation;
-        uint prevFrame;
-        //Explosion things
-        public static Texture2D[] Explosion;
-        private bool isExploding = false;
-        //private int explodingPhase = 0;
-        //private uint explosionTime = 0;
+        private static Texture2D[] frames; //Array of frames giving the illusion of 3D
+        //These two will help deciding when update the texture      
+        long prevFrameTime = 0;
+        byte frameNumber = 0;
 
         protected Asteroid() { }
 
         //Start with the first image
-        public Asteroid(Texture2D[] texture) : base(texture[0])
-        {
-            HeightMax = GameWidth / 6;
-            rotation = 0;
-            asteroid = texture;
-            prevFrame = 0;
-            CreateNew();            
+        public Asteroid(Texture2D[] texture) : base(texture[0], WindowHeight / 10)
+        {                     
+            frames = texture;            
+            //CreateNew(); Already called by the base class
         }
-
-        //HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        
         public override void Move(long dT)
         {
             base.Move(dT);
-            //Reset explosion after a new was created
-            if (PosY < 0) isExploding = false;
-            prevFrame += (uint)dT;
-            if (prevFrame > 30) //33 FPS
+            //Reset explosion after a new was created            
+            prevFrameTime += (uint)dT;
+            if (prevFrameTime > 30) //33 FPS
             {
-                if (isExploding)
-                {
-                    Texture = Explosion[rotation];
-                    rotation++;
-                    rotation = (byte)Math.Min(rotation, Explosion.Length - 1);
-                    prevFrame = 0;
-                }
-                else
-                {
-                    prevFrame = 0;
-                    rotation++;
-                    rotation %= (byte)asteroid.Length; //Not overflow but cycle
-                    Texture = asteroid[rotation]; //Update the frame
-                }
+                prevFrameTime = 0;
+                frameNumber++;
+                frameNumber %= (byte)frames.Length; //Not overflow but cycle
+                Texture = frames[frameNumber]; //Update the frame
             }
         }
 
-        public void DetectCollision(ICollidable component)
+        protected override void CreateNew()
         {
-            if (!isExploding & !component.IsExploded()) //If it is already exploding it's harmless
-            {
-                isExploding = where.Intersects(component.GetRectangle());
-                component.JustCollided(isExploding);
-                rotation = 0;
-                prevFrame = 0;
-            }
+            //Dimensions not specified, but the original texture ration will be conserved
+            Height = caos.Next(HeightMax / 8, HeightMax);
+            float ratio = (float)Texture.Height / (float)Texture.Width;
+            Width = (int)(Height / ratio);
+            //Speed
+            Speed = caos.Next(10, 20);
+            //And position
+            PosX = caos.Next(0, WindowWidth);
+            PosY = -Height - caos.Next(0, 400); //It needs to start outside the window
         }
 
-        public Rectangle GetRectangle()
-        {
-            return where;
-        }
+        //public void DetectCollision(ICollidable component)
+        //{
+        //    if (!isExploding & !component.IsExploded()) //If it is already exploding it's harmless
+        //    {
+        //        isExploding = where.Intersects(component.GetRectangle());
+        //        component.JustCollided(isExploding);
+        //        rotation = 0;
+        //        prevFrame = 0;
+        //    }
+        //}
 
-        public void JustCollided(bool isItTrue)
-        {
-            if (!isExploding && isItTrue) //Once it exploded, no way back
-                isExploding = true;
-        }
+        //public Rectangle GetRectangle()
+        //{
+        //    return where;
+        //}
 
-        public bool IsExploded()
-        {
-            return isExploding;
-        }
+        //public void JustCollided(bool isItTrue)
+        //{
+        //    if (!isExploding && isItTrue) //Once it exploded, no way back
+        //        isExploding = true;
+        //}
+
+        //public bool IsExploded()
+        //{
+        //    return isExploding;
+        //}
     }
 }
