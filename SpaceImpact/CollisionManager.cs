@@ -41,7 +41,7 @@ namespace SpaceImpact
             {
                 allcollidables.AddRange(bm.flyingBullets);
             }
-            //These loops may be reduced by half along with simmetry checks
+            //TODO These loops may be reduced by half along with simmetry checks
             foreach (ICollidable ic1 in allcollidables)
             {
                 firstObject = ic1.GetRectangle();

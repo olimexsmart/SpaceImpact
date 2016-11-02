@@ -27,7 +27,8 @@ namespace SpaceImpact
         int GameHeight = 600;
         int GameWidth = 960;
         //int DustIntensity = 4;
-        int AsteroidDensity = 20;
+        //Only even numbers or one is left null
+        int AsteroidDensity = 26;
 
         public SpaceImpactGame()
         {
