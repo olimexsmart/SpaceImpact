@@ -12,9 +12,9 @@ namespace SpaceImpact
     public interface ICollidable
     {
         //Start process of "self-destructing" of the object
-        void DetectCollision(ICollidable component);
+        //void DetectCollision(ICollidable component);
         Rectangle GetRectangle(); //It's necessary to retreive the space where the object lives in
-        void JustCollided(bool isItTrue);
-        bool IsExploded();
+        void SetCollided(bool isItTrue);
+        bool IsAlreadyCollided();
     }
 }

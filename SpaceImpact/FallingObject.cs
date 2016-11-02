@@ -25,7 +25,8 @@ namespace SpaceImpact
 
         protected FallingObject(Texture2D texture, int maxHeight) : base(texture, 0, 0)
         {
-            CreateNew();
+            HeightMax = maxHeight;
+            //CreateNew();
         }
 
         //public override void Draw()

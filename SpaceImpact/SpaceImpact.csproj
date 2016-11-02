@@ -41,6 +41,7 @@
     <Compile Include="Asteroid.cs" />
     <Compile Include="Bullet.cs" />
     <Compile Include="BulletManager.cs" />
+    <Compile Include="CollisionManager.cs" />
     <Compile Include="Dust.cs" />
     <Compile Include="Explosion.cs" />
     <Compile Include="FallingObject.cs" />

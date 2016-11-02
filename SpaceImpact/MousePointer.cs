@@ -45,7 +45,7 @@ namespace SpaceImpact
 
         public void Draw()
         {
-            spriteBatch.Draw(mouseTexture, new Rectangle(mousePosition.X - size, mousePosition.Y - size, size, size), Color.White);
+            spriteBatch.Draw(mouseTexture, new Rectangle(mousePosition.X - (size / 2), mousePosition.Y - (size / 2), size, size), Color.White);
         }
     }
 }

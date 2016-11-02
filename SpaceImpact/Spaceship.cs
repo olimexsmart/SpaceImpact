@@ -5,21 +5,28 @@ using Microsoft.Xna.Framework.Input;
 
 namespace SpaceImpact
 {
-    public class Spaceship : SpaceComponents//, ICollidable
+    public class Spaceship : SpaceComponents, ICollidable
     {
+        private bool isCollided = false;
+        private Explosion explosion;
+
         protected Spaceship() { }
 
         public Spaceship(Texture2D texture) : base(texture, WindowHeight / 10, WindowHeight / 10)
         {   //Put it right in the middle
             PosX = WindowWidth / 2;
             PosY = WindowHeight / 2;
+            explosion = new Explosion(Height, Width);
         }
 
 
-        //public override void Draw()
-        //{
-        //    base.Draw(); //Draw it, no hassle            
-        //}
+        public override void Draw()
+        {
+            if (isCollided)
+                explosion.DrawExplosion(PosX, PosY);
+            else
+                base.Draw(); //Draw it, no hassle            
+        }
 
         public override void Move(long dT)
         {
@@ -54,29 +61,20 @@ namespace SpaceImpact
             rotation = (float)Math.Atan2(mouse.X - PosX, PosY - mouse.Y);
         }
 
-        //public void DetectCollision(ICollidable component)
-        //{
-        //    if (!isExploding & !component.IsExploded()) //Once exploded become harmless
-        //    {
-        //        isExploding = where.Intersects(component.GetRectangle());
-        //        component.JustCollided(isExploding);
-        //    }
-        //}
+        public Rectangle GetRectangle()
+        {
+            return new Rectangle(PosX - (Width / 2), PosY + (Height / 2), Width, Height);
+        }
 
-        //public Rectangle GetRectangle()
-        //{
-        //    return where;
-        //}
+        public void SetCollided(bool isItTrue)
+        {
+            isCollided = isItTrue;
+        }
 
-        //public void JustCollided(bool isItTrue)
-        //{
-        //    if (!isExploding && isItTrue) //Once it exploded, no way back
-        //        isExploding = true;
-        //}
+        public bool IsAlreadyCollided()
+        {
+            return isCollided;
+        }
 
-        //public bool IsExploded()
-        //{
-        //    return isExploding;
-        //}
     }
 }

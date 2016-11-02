@@ -8,11 +8,11 @@ namespace SpaceImpact
 {
     public class BulletManager
     {
-        private Spaceship spacecraft;
-        private List<Bullet> flyingBullets;
-        Texture2D bulletTexture;
+        public Spaceship spacecraft;
+        public List<Bullet> flyingBullets;
+        private Texture2D bulletTexture;
         private long timeSinceLastShot = 0;
-        private int fireRate = 500; //Two at sec default
+        private int fireRate = 250; //Two at sec default
         public int FireRate
         {
             get { return fireRate; }
@@ -22,6 +22,7 @@ namespace SpaceImpact
                 else fireRate = value;
             }
         }
+        public bool FireEnable = true;
 
         private BulletManager() { }
 
@@ -35,7 +36,7 @@ namespace SpaceImpact
         public void MoveBullets(long dT)
         {
             timeSinceLastShot += dT;
-            if (timeSinceLastShot > fireRate) //Crate a new bullet
+            if (timeSinceLastShot > fireRate && FireEnable) //Crate a new bullet
             {
                 flyingBullets.Add(new Bullet(bulletTexture, spacecraft.PosX, spacecraft.PosY));
                 timeSinceLastShot = 0;

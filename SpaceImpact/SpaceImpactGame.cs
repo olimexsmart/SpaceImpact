@@ -19,18 +19,14 @@ namespace SpaceImpact
         Stopwatch update;
         Dust[] dust;
         Asteroid[] asteroid;
-        IDrawable[] components; //Hold the components in their drawing order
-        Texture2D mouseTexture;
-        Texture2D bulletTexture;
-        //Maybe this should stay in another class
-        List<Bullet> flyingBullets;
-        long fireRate = 250;
-        long lastFire = 0;
+        //IDrawable[] components; //Hold the components in their drawing order
+        MousePointer mousePointer;
+        BulletManager bulletManager;
+        CollisionManager collisionManager;
 
-        Vector2 mouse;
         int GameHeight = 600;
         int GameWidth = 960;
-        int DustIntensity = 4;
+        //int DustIntensity = 4;
         int AsteroidDensity = 20;
 
         public SpaceImpactGame()
@@ -69,71 +65,63 @@ namespace SpaceImpact
             spriteFont = Content.Load<SpriteFont>("FontArial");
 
             //Crating a unique container for these elements
-            components = new IDrawable[2 + DustIntensity + AsteroidDensity];
+            //components = new IDrawable[2 + DustIntensity + AsteroidDensity];
 
             spaceship = new Spaceship(Content.Load<Texture2D>("spaceship")); //Avoid asteroids in initial position
-            components[1] = spaceship;
+            //components[1] = spaceship;
 
             wallpaper = new Wallpaper(Content.Load<Texture2D>("spaceTexture"));
-            components[0] = wallpaper;
+            //components[0] = wallpaper;
 
-            //Asteroids init
             int i;
+            //Asteroids init, there are two series of frames, loading them in equal numbers
             asteroid = new Asteroid[AsteroidDensity];
             Texture2D allFrames = Content.Load<Texture2D>("dynAsteroid");
-            Texture2D[] frames = new Texture2D[64];
-            for (i = 0; i < frames.Length; i++)
+            Texture2D[] framesA = new Texture2D[31];
+            Texture2D[] framesB = new Texture2D[31];            
+            for (i = 32; i < framesA.Length + 32; i++)
             {
-                frames[i] = Crop(allFrames, new Rectangle(128 * (i % 8), 128 * (i / 8), 128, 128));
+                framesA[i - 32] = Crop(allFrames, new Rectangle(128 * (i % 8), 128 * (i / 8), 128, 128));
             }
-            for (i = 0; i < asteroid.Length; i++)
+            for (i = 0; i < framesB.Length; i++)
             {
-                asteroid[i] = new Asteroid(frames);
-                components[i + 2] = asteroid[i];
+                framesB[i] = Crop(allFrames, new Rectangle(128 * (i % 8), 128 * (i / 8), 128, 128));
             }
-
-
+            for (i = 0; i < asteroid.Length / 2; i++)
+            {
+                asteroid[i] = new Asteroid(framesA);
+                asteroid[i + asteroid.Length / 2] = new Asteroid(framesB);
+            }
+            
+            
             //Dust nebulas init, TODO better this init part of the dust
-            dust = new Dust[DustIntensity];
-           
-            //for (i = 0; i < 2; i++)          
-            dust[0] = new Dust(Content.Load<Texture2D>("dust1"));
-
-            //for (; i < 5; i++)
+            dust = new Dust[4];                       
+            dust[0] = new Dust(Content.Load<Texture2D>("dust1"));           
             dust[1] = new Dust(Content.Load<Texture2D>("dust2"));
-
-            //for (; i < 7; i++)
             dust[2] = new Dust(Content.Load<Texture2D>("dust3"));
-
-            //for (; i < dust.Length; i++)
-            dust[3] = new Dust(Content.Load<Texture2D>("dust4"));
-            i = 2 + AsteroidDensity;
-            foreach (Dust d in dust)
-            {
-                components[i] = d;
-                i++;
-            }
-
+            dust[3] = new Dust(Content.Load<Texture2D>("dust4"));            
+            
             //Mouse pointer
-            mouseTexture = Content.Load<Texture2D>("aim");
-            mouse = new Vector2(0, 0);
+            mousePointer = new MousePointer(spriteBatch, Content.Load<Texture2D>("aim"), SpaceComponents.WindowHeight, SpaceComponents.WindowWidth);
 
             //Bullet texture
-            bulletTexture = Crop(Content.Load<Texture2D>("bullet"), new Rectangle(177, 68, 18, 18));
-            flyingBullets = new List<Bullet> { };
+            bulletManager = new BulletManager(spaceship, Crop(Content.Load<Texture2D>("bullet"), new Rectangle(177, 68, 18, 18)));
+
+            //Collision manager loading
+            collisionManager = new CollisionManager();
+            collisionManager.AddBulletManager(bulletManager);
+            collisionManager.AddCollidableCollection(asteroid);
+            collisionManager.AddCollidable(spaceship);
 
             //Explosion frames loading
-            Spaceship.Explosion = new Texture2D[48];
-            Asteroid.Explosion = new Texture2D[48];
-            Texture2D frame;
+            Explosion.spriteBatch = spriteBatch;
+            Explosion.frames = new Texture2D[48];                        
             allFrames = Content.Load<Texture2D>("explosion");
-            for (i = 0; i < 48; i++)
-            {
-                frame = Crop(allFrames, new Rectangle(256 * (i % 8), 256 * (i / 8), 256, 256));
-                Spaceship.Explosion[i] = frame;
-                Asteroid.Explosion[i] = frame;
+            for (i = 0; i < Explosion.frames.Length; i++)
+            {           
+                Explosion.frames[i] = Crop(allFrames, new Rectangle(256 * (i % 8), 256 * (i / 8), 256, 256));
             }
-
+                        
             //Delta T between updates
             update = new Stopwatch();
             update.Start();
@@ -161,41 +149,14 @@ namespace SpaceImpact
             long dT = update.ElapsedMilliseconds; //Time differential
 
             spaceship.Move(dT);
-
-            foreach (Dust d in dust)
+            bulletManager.MoveBullets(dT);
+            mousePointer.MoveMouse();
+            foreach (Dust d in dust)           
                 d.Move(dT);
-
             foreach (Asteroid a in asteroid)
-                a.Move(dT);            
+                a.Move(dT);
 
-            mouse.X = Mouse.GetState().X;
-            mouse.Y = Mouse.GetState().Y;
-
-            //Bullet management
-            if (!spaceship.IsExploded())
-            {
-                lastFire += dT;
-                if (lastFire > fireRate) //Crate a new bullet
-                {
-                    flyingBullets.Add(new Bullet(bulletTexture, spaceship.PosX, spaceship.PosY));
-                    lastFire = 0;
-                }
-            }
-            flyingBullets.RemoveAll(x => x.OutOfBounds); //MAMMA MIAAAAAAA SEE
-            foreach (Bullet b in flyingBullets)            
-                b.Move(dT);
-
-            //Collision detection
-            foreach (ICollidable a in asteroid)
-            {
-                a.DetectCollision(spaceship); //Between spaceship and asteroid
-
-                foreach (ICollidable b in flyingBullets)//Asteroids and bullets
-                {
-                    b.DetectCollision(a);
-                }
-            }
-            
+            collisionManager.DetectCollisions();
 
             base.Update(gameTime);
 
@@ -214,23 +175,18 @@ namespace SpaceImpact
 
             wallpaper.Draw();
             spaceship.Draw();
-
+            bulletManager.DrawBullets();            
             foreach (Asteroid a in asteroid)
                 a.Draw();
-
-            foreach (Bullet b in flyingBullets)
-                b.Draw();
-
             foreach (Dust d in dust)
-                d.Draw();
-            
+                d.Draw();            
 
             //Mouse pointer draw
-            spriteBatch.Draw(mouseTexture, new Rectangle((int)mouse.X - GameHeight / 20, (int)mouse.Y - GameHeight / 20, GameHeight / 10, GameHeight / 10), Color.White);
+            mousePointer.Draw();
 
             //Text outuput
-            spriteBatch.DrawString(spriteFont, "Mouse positon: " + mouse.X + ", " + mouse.Y + "\nBullets: " + flyingBullets.Count, new Vector2(0, 0), Color.Red);
-
+            spriteBatch.DrawString(spriteFont, "Mouse positon: " + MousePointer.MousePositionX + ", " + MousePointer.MousePositionY, new Vector2(0, 0), Color.Red);
+            
             spriteBatch.End();
             base.Draw(gameTime);
         }
